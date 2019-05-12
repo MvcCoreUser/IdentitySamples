@@ -10,9 +10,18 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            var token = GetToken("http://localhost:5000").GetAwaiter().GetResult();
-            Console.WriteLine(token.Json);
-            RunClient(token.AccessToken, "http://localhost:5001/identity").GetAwaiter().GetResult();
+            try
+            {
+                var token = GetToken("http://localhost:5000").GetAwaiter().GetResult();
+                Console.WriteLine(token.Json);
+                RunClient(token.AccessToken, "http://localhost:5001/identity").GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }
+           
             Console.ReadKey();
         }
 
@@ -28,12 +37,15 @@ namespace Client
                 
             }
 
-            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
             {
                 Address = disco.TokenEndpoint,
-                ClientId = "client",
+                ClientId = "ro.client",
                 ClientSecret = "secret",
-                Scope = "api1"
+                Scope = "api1",
+                
+                UserName="alice",
+                Password="password"
             });
 
             if (tokenResponse.IsError)
